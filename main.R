@@ -254,8 +254,7 @@ server <- function(input, output) {
   
   filtered_table <- function(hdataframe) {
     filtered_data <- hdataframe 
-    #filter(padj < 0.05) %>%
-    #filter(log2FoldChange > 0)
+    
     
     return(filtered_data)
     
@@ -434,7 +433,7 @@ server <- function(input, output) {
     
     counts_matrix$frequency <- rowSums(counts_matrix != 0)
     counts_matrix$median <- apply(counts_matrix[,-1], 1, median)
-    #zeroo <- counts_matrix[which(counts_matrix$frequency > slider_zero),]
+    
     
     Filter_Method <- counts_matrix$frequency > slider_zero
     messi <- ggplot(data = counts_matrix, 
