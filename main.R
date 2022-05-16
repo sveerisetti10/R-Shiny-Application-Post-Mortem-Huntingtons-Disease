@@ -183,21 +183,9 @@ ui <- fluidPage(
                             icon = icon('car-crash')),
                plotOutput('plottingbar'),
                br(), 
-               plotOutput('plottingpoint')
-               
-               
-      ),
-      
-      
-      
-      
-    )),
-  
-  
+               plotOutput('plottingpoint')),    
+    )),  
 )
-
-
-
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -345,9 +333,7 @@ server <- function(input, output) {
                      "Percent not Passing")
     
     Values <- c(counts_columns, counts_rows, counts_variance_rows, (counts_variance_rows/counts_rows) * 100, (28087 - counts_variance_rows), (100 - (counts_variance_rows/counts_rows) * 100))
-    
     summary_variance <- data_frame(Information, Values)
-    
     return(summary_variance)
     
     
@@ -376,16 +362,11 @@ server <- function(input, output) {
     counts_not_passing <- 28087 - counts_passing
     percent_not_passing <- 100 - percent_passing
     
-    
-    
     Info <- c("Number of Samples", "Number of Genes", "Number of Passing", "Percent Passing", "Number not Passing", 
               "Percent not Passing")
     
     Statistics <- c(counts_samples, counts_genes, counts_passing, percent_passing, counts_not_passing, percent_not_passing)
-    
     summary_zero <- data_frame(Info, Statistics)
-    
-    
     return(summary_zero)
     
   }
@@ -404,7 +385,6 @@ server <- function(input, output) {
       counts_matrix$variance <- rowVars(as.matrix(county))
       counts_matrix <- counts_matrix[rev(order(counts_matrix$variance)),]
       input_value <- slider/100 
-      
       
       counts_matrix$median <- apply(counts_matrix[,-1], 1, median)
       
@@ -434,7 +414,6 @@ server <- function(input, output) {
     counts_matrix$frequency <- rowSums(counts_matrix != 0)
     counts_matrix$median <- apply(counts_matrix[,-1], 1, median)
     
-    
     Filter_Method <- counts_matrix$frequency > slider_zero
     messi <- ggplot(data = counts_matrix, 
                     aes(x = median, y = -log10(frequency)))+
@@ -446,8 +425,6 @@ server <- function(input, output) {
     
     return(messi)
   }
-  
-  
   
   #'@details Here we want to produce a heat map post filtering of the counts
   #'matrix that the user has inputted
@@ -810,16 +787,10 @@ server <- function(input, output) {
       
       
     }
-    
-    
-    
+  
   }, height = 400)
-  
-  
-  
-  
+ 
 }
-
 
 # Run the application 
 shinyApp(ui = ui, server = server)
