@@ -76,8 +76,7 @@ ui <- fluidPage(
                           br(),
                           br(),
                           hr('This is a density plot that displays the variable of your choice on the x-axis and density on the y-axis'),
-                          plotOutput('plotting_density')),
-                 
+                          plotOutput('plotting_density')),  
                )
       ),
       tabPanel("Counts Matrix", 
@@ -158,7 +157,6 @@ ui <- fluidPage(
                
                
       ), 
-      
       tabPanel("Visualization of Individual Gene Expression", 
                fileInput(
                  inputId = 'fusion_journey', 
@@ -177,8 +175,7 @@ ui <- fluidPage(
                radioButtons(
                  inputId = 'plot_type', 
                  label = 'Type of Plot', 
-                 choices = c("Bar_Plot", "Scatter_Plot", 'Beeswarm_Plot')
-               ),
+                 choices = c("Bar_Plot", "Scatter_Plot", 'Beeswarm_Plot')),
                submitButton(text = 'Submit', 
                             icon = icon('car-crash')),
                plotOutput('plottingbar'),
@@ -189,13 +186,11 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-  
   #' @details The purpose of this function is to load in the sample information
   #' .csv file. The user has the ability to input their file 
   load_file <- reactive ({
     huntington <- read_csv(input$file$datapath)
-    return(huntington)
-    
+    return(huntington)  
   })
   
   #' Here we want to make a dataframe summarizing the sample information file
@@ -232,7 +227,6 @@ server <- function(input, output) {
                             Sample_mrna_seq_average, '41.85')
     
     summarized_df <- data_frame(Column_Name, Classification, Average_Summarized)
-    
     return(summarized_df)
   }
   
@@ -243,9 +237,7 @@ server <- function(input, output) {
   filtered_table <- function(hdataframe) {
     filtered_data <- hdataframe 
     
-    
-    return(filtered_data)
-    
+    return(filtered_data) 
   }
   
   #' @details  Here the goal is to develop a way for the user to generate a 
@@ -314,13 +306,11 @@ server <- function(input, output) {
   
   filterering_variance <- function(counts_matrix, slider) {
     
-    
     county <- counts_matrix[,-1] 
     counts_matrix$variance <- rowVars(as.matrix(county))
     counts_matrix <- counts_matrix[rev(order(counts_matrix$variance)),]
     input_value <- slider/100 #assumes slider is between 1 and 100
     counts_matrix <- counts_matrix[1:floor(nrow(counts_matrix)*input_value), ]
-    
     counts_variance <- counts_matrix[, c(1,71)]
     
     counts_columns <- ncol(county)
@@ -328,15 +318,13 @@ server <- function(input, output) {
     counts_variance_columns <- ncol(counts_variance)
     counts_variance_rows <- nrow(counts_variance)
     
-    
     Information <- c("Number of Samples", "Number of Genes", "Number of Passing", "Percent Passing,", "Number not Passing", 
                      "Percent not Passing")
     
     Values <- c(counts_columns, counts_rows, counts_variance_rows, (counts_variance_rows/counts_rows) * 100, (28087 - counts_variance_rows), (100 - (counts_variance_rows/counts_rows) * 100))
     summary_variance <- data_frame(Information, Values)
-    return(summary_variance)
     
-    
+    return(summary_variance)  
   }
   
   
@@ -352,7 +340,6 @@ server <- function(input, output) {
     
     counts_matrix$frequency <- rowSums(counts_matrix != 0)
     zeroo <- counts_matrix[which(counts_matrix$frequency > slider_zero),]
-    
     display <- zeroo[, c(1)]
     
     counts_samples <- ncol(counts_matrix)
@@ -364,11 +351,10 @@ server <- function(input, output) {
     
     Info <- c("Number of Samples", "Number of Genes", "Number of Passing", "Percent Passing", "Number not Passing", 
               "Percent not Passing")
-    
     Statistics <- c(counts_samples, counts_genes, counts_passing, percent_passing, counts_not_passing, percent_not_passing)
     summary_zero <- data_frame(Info, Statistics)
-    return(summary_zero)
     
+    return(summary_zero)  
   }
   
   
@@ -390,8 +376,7 @@ server <- function(input, output) {
       
       Filter_Method <- (floor(nrow(counts_matrix)*input_value)) > counts_matrix$variance
       
-      eruption <- ggplot(data = counts_matrix, 
-                         aes(x = median, y = -log10(variance)))+
+      eruption <- ggplot(data = counts_matrix, aes(x = median, y = -log10(variance)))+
         geom_point(aes(color = Filter_Method)) + 
         theme_bw() + 
         scale_color_manual(values = c('green', 'blue')) + 
@@ -447,12 +432,9 @@ server <- function(input, output) {
     updated_counts_matrix$frequency <- rowSums(updated_counts_matrix != 0)
     #Here we want values that are only greater than the slider value that the user chooses
     combination <- updated_counts_matrix[which(updated_counts_matrix$frequency > slider_zero), ]
-    
     combination <- as.matrix(combination[, -1])
-    
     hot <- heatmap(combination, col = terrain.colors(256))
-    
-    
+  
     return(hot)
     
     
@@ -467,9 +449,7 @@ server <- function(input, output) {
     pca_plotting <- prcomp(counts_matrix, scale. = TRUE)
     plot_project <- autoplot(pca_plotting, data = counts_matrix, colour = "red")
     
-    
     return(plot_project)
-    
   }
   
   #'XXXXXXXXXXXXXXXXXXXXXXX Differential Expression XXXXXXXXXXXXXXXXXXXXX
@@ -588,7 +568,6 @@ server <- function(input, output) {
       select(c(gene_selection, Sample_Neurological_Diagnosis)) 
     
     point_matrix$sample_number <- 1:nrow(point_matrix)
-    
     sample_number <- rownames(point_matrix)
     
     point_matrix_plot <- 
@@ -694,7 +673,6 @@ server <- function(input, output) {
     req(input$count_file)
     c_matrix <- load_counts()
     
-    
     return(filterering_variance(c_matrix, slider = input$slider))
     
   })
@@ -711,9 +689,7 @@ server <- function(input, output) {
   output$volcano <- renderPlot({
     req(input$count_file)
     c_matrix <- load_counts()
-    eruption <- volcano_plot_variance(c_matrix,
-                                      slider = input$slider
-    )
+    eruption <- volcano_plot_variance(c_matrix, slider = input$slider)
     return(eruption)
     
   }, height = 400)
@@ -721,9 +697,7 @@ server <- function(input, output) {
   output$heatmap <- renderPlot({
     req(input$count_file)
     c_matrix <- load_counts()
-    hot <- heatmap_plot(c_matrix, slider = input$slider, 
-                        slider_zero = input$slider_zero) 
-    
+    hot <- heatmap_plot(c_matrix, slider = input$slider, slider_zero = input$slider_zero) 
     
     return(hot)
     
@@ -752,8 +726,7 @@ server <- function(input, output) {
     different <- load_DE_data()
     final <- de_volcano_plot(dataframe = different, x_name = input$x_value, 
                              input$color1, input$color2) 
-    
-    
+   
     return(final)
     
   })
